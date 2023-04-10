@@ -26,9 +26,11 @@ class RestaurantSearchForm(forms.Form):
 
 class ReviewForm(forms.ModelForm):
     comment = forms.CharField(widget=forms.Textarea(attrs={'rows': 5}), validators=[MaxLengthValidator(300)])
+    image = forms.ImageField(required=False)
+
     class Meta:
         model = Review
-        fields = ['title', 'comment', 'rate']
+        fields = ['title', 'comment', 'rate', 'image']
 
     def save(self, restaurant=None, author=None, commit=True):
         review = super().save(commit=False)

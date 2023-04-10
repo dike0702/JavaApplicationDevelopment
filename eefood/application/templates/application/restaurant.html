@@ -37,6 +37,9 @@
                     <div class="card-body">
                         <h2 class="card-title">{{ review.title }}</h2>
                         <p class="card-text">{{ review.comment }}</p>
+                        {% if review.image %}
+                        <img src="{{ review.image.url }}" alt="Review Image" class="img-fluid">
+                        {% endif %}
                         <p class="star-rating">
                             {% for i in review.get_rate_display %}★{% endfor %}
                         </p>

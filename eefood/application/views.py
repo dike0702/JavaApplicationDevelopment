@@ -114,7 +114,7 @@ class RestaurantReviewView(UserPassesTestMixin, View):
 
     def post(self, request, pk):
         restaurant = Restaurants.objects.get(name=pk)
-        form = ReviewForm(request.POST)
+        form = ReviewForm(request.POST, request.FILES)
         if form.is_valid():
             review = form.save(commit=False, restaurant=restaurant, author=self.request.user)
             review.restaurant = restaurant
@@ -122,6 +122,12 @@ class RestaurantReviewView(UserPassesTestMixin, View):
             review.title = form.cleaned_data['title']
             review.comment = form.cleaned_data['comment']
             review.save()
+            
+            # 画像がアップロードされている場合、保存する
+            if form.cleaned_data['image']:
+                review.image = form.cleaned_data['image']
+                review.save()
+                
             messages.success(request, 'Your review has been submitted.')
             return redirect('restaurant_detail', pk=restaurant.name)
         
