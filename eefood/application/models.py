@@ -33,6 +33,15 @@ class Restaurants(models.Model):
         blank=True,
         upload_to='media/'
     )
+    monday_hours = models.CharField(max_length=50, blank=True, null=True)
+    tuesday_hours = models.CharField(max_length=50, blank=True, null=True)
+    wednesday_hours = models.CharField(max_length=50, blank=True, null=True)
+    thursday_hours = models.CharField(max_length=50, blank=True, null=True)
+    friday_hours = models.CharField(max_length=50, blank=True, null=True)
+    saturday_hours = models.CharField(max_length=50, blank=True, null=True)
+    sunday_hours = models.CharField(max_length=50, blank=True, null=True)
+
+    
 
     def __str__(self):
         return self.name
