@@ -10,6 +10,7 @@ from django.shortcuts import render
 from django.views.generic.edit import FormView, UpdateView, DeleteView
 from django.http import HttpResponseForbidden
 from django.db.models import Avg, Q
+from django.views.generic.base import TemplateView
 
 class IndexView(ListView):
     template_name = 'application/index.html'
@@ -203,3 +204,7 @@ class HigherReviewListView(ListView):
         qs = Restaurants.objects.annotate(avg_score=Avg('reviews__rate')).filter(avg_score__gte=4.0)
         qs = qs.annotate(avg_rate=Avg('reviews__rate'))
         return qs
+
+class ToolsView(TemplateView):
+    template_name = 'tools.html'
+
