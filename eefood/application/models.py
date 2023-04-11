@@ -109,6 +109,7 @@ class Review(models.Model):
     rate = models.IntegerField(verbose_name='レビュースコア', choices=SCORE_CHOICES, default='3')
     image = models.ImageField(upload_to='review_images', null=True, blank=True)
     created = models.DateTimeField("Date", default=timezone.now)
+    avg_score = models.DecimalField(max_digits=3, decimal_places=1, null=True)
         
     def __str__(self):
             return str(self.author)

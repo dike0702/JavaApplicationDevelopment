@@ -194,3 +194,12 @@ class ReviewDeleteView(LoginRequiredMixin, DeleteView):
         success_url = self.get_success_url()
         self.object.delete()
         return HttpResponseRedirect(success_url)
+    
+class HigherReviewListView(ListView):
+    template_name = 'application/higher_review.html'
+    context_object_name = 'restaurants'
+
+    def get_queryset(self):
+        qs = Restaurants.objects.annotate(avg_score=Avg('reviews__rate')).filter(avg_score__gte=4.0)
+        qs = qs.annotate(avg_rate=Avg('reviews__rate'))
+        return qs

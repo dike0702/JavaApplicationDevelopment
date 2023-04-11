@@ -1,0 +1,20 @@
+{% extends 'application/base.html' %}
+
+{% block content %}
+  <h1>Higher Reviewed Restaurants</h1>
+  {% if restaurants %}
+    {% for restaurant in restaurants %}
+      <h2>{{ restaurant.name }}</h2>
+      <p>{{ restaurant.addr }}</p>
+      <p>{{ restaurant.Genre }}</p>
+      <p>{{ restaurant.phone }}</p>
+      <p>Average review rate: {{ restaurant.avg_rate }}</p>
+      {% if restaurant.img %}
+        <img src="{{ restaurant.img.url }}" width="200px">
+      {% endif %}
+      <hr>
+    {% endfor %}
+  {% else %}
+    <p>No restaurants found.</p>
+  {% endif %}
+{% endblock %}
