@@ -1,9 +1,9 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, get_object_or_404
 from django.views import View
 from application.models import Reservation
 from django.http.response import HttpResponseRedirect
 from .forms import LoginForm, SignUpForm, UserChangeForm
-from application.models import Reservation
+from application.models import Reservation, FavoriteRestaurant
 from application.forms import ReservationForm
 from django.contrib.auth import login
 from django.contrib.auth.models import User
@@ -17,8 +17,10 @@ class ProfileView(View):
     def get(self, request, *args, **kwargs):
         user = self.request.user
         reservation = Reservation.objects.filter(name=user)
+        favorite_restaurants = FavoriteRestaurant.objects.filter(user=user)
         return render(request, 'accounts/profile.html', {
             'reservation': reservation,
+            'favorite_restaurants': favorite_restaurants,
         })
 
 class ReservationDeleteView(DeleteView):
@@ -70,3 +72,13 @@ class UserChangeView(LoginRequiredMixin, FormView):
             'email' : self.request.user.email,
         })
         return kwargs
+    
+class FavoriteDeleteView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        favorite = get_object_or_404(FavoriteRestaurant, pk=pk)
+        if favorite.user == request.user:
+            favorite.delete()
+            messages.success(request, "The restaurant has been removed from your favorites.")
+        else:
+            messages.warning(request, "You are not authorized to delete this restaurant from your favorites.")
+        return redirect('profile')

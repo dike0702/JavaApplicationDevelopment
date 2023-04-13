@@ -8,5 +8,7 @@ urlpatterns = [
     path('login/', views.Login.as_view(), name = 'login'),
     path('logout/', views.Logout.as_view(), name = 'logout'),
     path('signup/', views.SignUpView.as_view(), name = 'signup'),
-    path('change/', views.UserChangeView.as_view(), name = 'modification')
+    path('change/', views.UserChangeView.as_view(), name = 'modification'),
+    path('restaurant/<int:pk>/favorite/delete/', views.FavoriteDeleteView.as_view(), name='favorite_delete'),
+
 ]

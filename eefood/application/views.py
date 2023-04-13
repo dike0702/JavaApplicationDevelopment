@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import View, ListView
-from .models import Restaurants, Review, Reservation
+from .models import Restaurants, Review, Reservation, FavoriteRestaurant
 from django.contrib import messages
 from .forms import ReviewForm, PostRestaurantForm, ReservationForm, RestaurantSearchForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -207,4 +207,17 @@ class HigherReviewListView(ListView):
 
 class ToolsView(TemplateView):
     template_name = 'tools.html'
+    
+class FavoriteView(LoginRequiredMixin, View):
+    def post(self, request, name):
+        restaurant = get_object_or_404(Restaurants, name=name)
+        try:
+            favorite = FavoriteRestaurant.objects.create(user=request.user, restaurant=restaurant)
+            messages.success(request, f"{restaurant.name} has been added to your favorites.")
+        except:
+            messages.warning(request, "You have already added this restaurant to your favorites.")
+        return redirect('restaurant', name=name)
+
+
+
 

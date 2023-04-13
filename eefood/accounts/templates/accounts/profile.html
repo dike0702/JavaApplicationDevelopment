@@ -59,5 +59,42 @@
         </div>
     </div>
 {% endif %}
+{% if favorite_restaurants %}
+    <div class="card card-profile my-5 mx-auto">
+        <div class="card-body">
+            <h2>Your Favorite Restaurants</h2>
+            {% for favorite in favorite_restaurants %}
+                <table class="profile_table mb-4">
+                    <tbody>
+                        <tr>
+                            <th class="header">Restaurant name:</th>
+                            <td class="data">{{ favorite.restaurant.name }}</td>
+                        </tr>
+                        <tr>
+                            <th class="header">Genre:</th>
+                            <td class="data">{{ favorite.restaurant.Genre }}</td>
+                        </tr>
+                        <tr>
+                            <th class="header">Address:</th>
+                            <td class="data">{{ favorite.restaurant.addr }}</td>
+                        </tr>
+                        <tr>
+                            <th class="header">Phone:</th>
+                            <td class="data">{{ favorite.restaurant.phone }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <form method="POST" action="{% url 'favorite_delete' favorite.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Remove from favorites</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
 
 {% endblock %}

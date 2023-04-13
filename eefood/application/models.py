@@ -114,3 +114,10 @@ class Review(models.Model):
     def __str__(self):
             return str(self.author)
         
+class FavoriteRestaurant(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(Restaurants, on_delete=models.CASCADE)
+    
+    class Meta:
+        unique_together = ('user', 'restaurant')
+        
