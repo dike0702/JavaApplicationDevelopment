@@ -106,7 +106,8 @@ class ReservationDetailView(View):
     def get_queryset(self):
         return super().get_queryset().filter(name=self.request.user)
 
-class RestaurantReviewView(UserPassesTestMixin, View):
+class RestaurantReviewView(LoginRequiredMixin, UserPassesTestMixin, View):
+    login_url = '/accounts/login/'
     def get(self, request, pk):
         restaurant = Restaurants.objects.get(name=pk)
         form = ReviewForm()
@@ -209,6 +210,7 @@ class ToolsView(TemplateView):
     template_name = 'tools.html'
     
 class FavoriteView(LoginRequiredMixin, View):
+    login_url = '/accounts/login/'
     def post(self, request, name):
         restaurant = get_object_or_404(Restaurants, name=name)
         try:
