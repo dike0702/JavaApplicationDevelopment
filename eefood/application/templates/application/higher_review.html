@@ -1,20 +1,39 @@
 {% extends 'application/base.html' %}
 
 {% block content %}
-  <h1>Higher Reviewed Restaurants</h1>
-  {% if restaurants %}
-    {% for restaurant in restaurants %}
-      <h2>{{ restaurant.name }}</h2>
-      <p>{{ restaurant.addr }}</p>
-      <p>{{ restaurant.Genre }}</p>
-      <p>{{ restaurant.phone }}</p>
-      <p>Average review rate: {{ restaurant.avg_rate }}</p>
-      {% if restaurant.img %}
-        <img src="{{ restaurant.img.url }}" width="200px">
-      {% endif %}
-      <hr>
-    {% endfor %}
-  {% else %}
-    <p>No restaurants found.</p>
-  {% endif %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8 mx-auto">
+        <div class="card card-profile my-5">
+          <div class="card-body">
+            <h2>Higher Reviewed Restaurants</h2>
+            {% if restaurants %}
+              {% for restaurant in restaurants %}
+                <div class="restaurant-card">
+                  <h3>{{ restaurant.name }}</h3>
+                  <p>{{ restaurant.addr }}</p>
+                  <p>{{ restaurant.Genre }}</p>
+                  <p>{{ restaurant.phone }}</p>
+                  <p>Average review rate: {{ restaurant.avg_rate }}</p>
+                  <div class="text-center">
+                    {% if restaurant.img %}
+                      <div>
+                        <img src="{{ restaurant.img.url }}" class="restaurant-img" alt="{{ restaurant.name }}">
+                      </div>
+                    {% endif %}
+                    <div>
+                      <a href="{% url 'restaurant_detail' restaurant.pk %}" class="btn btn-primary">View Details</a>
+                    </div>
+                  </div>
+                  <hr>
+                </div>
+              {% endfor %}
+            {% else %}
+              <p>No restaurants found.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
