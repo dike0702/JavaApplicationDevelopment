@@ -11,11 +11,12 @@ from django.views.generic.edit import FormView, UpdateView, DeleteView
 from django.http import HttpResponseForbidden
 from django.db.models import Avg, Q
 from django.views.generic.base import TemplateView
+from django.core.paginator import Paginator
 
 class IndexView(ListView):
     template_name = 'application/index.html'
     context_object_name = 'restaurant_data'
-    paginate_by = 10
+    paginate_by = None
 
     def get_queryset(self):
         query_name = self.request.GET.get('name')
