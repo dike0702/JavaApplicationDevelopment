@@ -1,1 +1,1 @@
-web: gunicorn eefood.wsgi
+web: gunicorn eefood.wsgi --log-file -
