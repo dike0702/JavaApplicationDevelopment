@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import View, ListView
 from .models import Restaurants, Review, Reservation, FavoriteRestaurant
 from django.contrib import messages
-from .forms import ReviewForm, PostRestaurantForm, ReservationForm, RestaurantSearchForm
+from .forms import ReviewForm, PostRestaurantForm, ReservationForm, MenuItemForm, RestaurantSearchForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
@@ -221,6 +221,40 @@ class FavoriteView(LoginRequiredMixin, View):
             messages.warning(request, "You have already added this restaurant to your favorites.")
         return redirect('restaurant', name=name)
 
+class RestaurantMenuView(LoginRequiredMixin, UserPassesTestMixin, View):
+    login_url = '/accounts/login/'
 
+    def get_object(self):
+        return Restaurants.objects.get(name=self.kwargs['pk'])
 
+    def get(self, request, pk):
+        restaurant = self.get_object()
+        form = MenuItemForm()
+        context = {'restaurant': restaurant, 'form': form}
+        return render(request, 'application/add_menu.html', context)
+
+    def post(self, request, pk):
+        restaurant = self.get_object()
+        form = MenuItemForm(request.POST, request.FILES)
+        if form.is_valid():
+            menu_item = form.save(commit=False, restaurant=restaurant, author=self.request.user)
+            menu_item.restaurant = restaurant
+            menu_item.name = request.user
+            menu_item.price = form.cleaned_data['price']
+
+            # 画像がアップロードされている場合、保存する
+            if form.cleaned_data['image']:
+                menu_item.image = form.cleaned_data['image']
+                menu_item.save()
+
+            messages.success(request, 'Your menu item has been added.')
+            return redirect('restaurant_detail', pk=restaurant.name)
+
+        else:
+            messages.error(request, 'There was an error adding your menu item.')
+        context = {'restaurant': restaurant, 'form': form}
+        return render(request, 'application/add_menu.html', context)
+
+    def test_func(self):
+        return self.request.user.is_authenticated and (self.request.user.is_superuser or self.get_object().created_by == self.request.user)
 

@@ -27,6 +27,7 @@
                         <hr>                    
                         <a href="{% url 'reservation' restaurant_data.pk %}" class="btn btn-primary">Make Reservation</a>
                         <a href="{% url 'restaurant_review' pk=restaurant_data.pk %}" class="btn btn-primary">Add Review</a>
+                        <a href="{% url 'add_menu' pk=restaurant_data.pk %}" class="btn btn-primary">Add Menu</a>
                         <form method="POST" action="{% url 'favorite' restaurant_data.name %}">
                             {% csrf_token %}
                             <hr>

@@ -17,5 +17,6 @@ urlpatterns = [
     path('higher_review/', views.HigherReviewListView.as_view(), name='higher_review'),
     path('tools/', views.ToolsView.as_view(), name='tools'),
     path('restaurant/<str:name>/favorite/', views.FavoriteView.as_view(), name='favorite'),
+    path('add_menu/<str:pk>/', views.RestaurantMenuView.as_view(), name='add_menu'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

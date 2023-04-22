@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Restaurants, Reservation, Review
+from .models import Restaurants, Reservation, Review, MenuItem
 from django.core.validators import MaxLengthValidator
 
 class PostRestaurantForm(ModelForm):
@@ -39,3 +39,10 @@ class ReviewForm(forms.ModelForm):
         if commit:
             review.save()
         return review
+    
+class MenuItemForm(forms.ModelForm):
+    class Meta:
+        model = MenuItem
+        fields = ['name', 'price', 'image']
+        labels = {'name': 'Menu Item Name', 'price': 'Price', 'image': 'Image'}
+        widgets = {'image': forms.FileInput(attrs={'class': 'form-control-file'})}
