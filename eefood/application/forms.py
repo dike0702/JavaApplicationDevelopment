@@ -55,3 +55,4 @@ class MenuItemForm(forms.ModelForm):
         if commit:
             menu_item.save()
         return menu_item
+    

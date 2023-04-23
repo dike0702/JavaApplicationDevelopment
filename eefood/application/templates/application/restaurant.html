@@ -127,7 +127,9 @@
                 <img src="{{ menu_item.image.url }}" class="card-img-top" alt="...">
                 <div class="card-body">
                   <h5 class="card-title">{{ menu_item.name }}</h5>
-                  <p class="card-text">Price: {{ menu_item.price }}</p>
+                  <p class="card-text">Price: $ {{ menu_item.price }}</p>
+                  <a href="{% url 'menu_edit' pk=menu_item.pk %}" class="btn btn-primary">Edit</a>
+                  <a href="{% url 'menu_delete' pk=menu_item.pk %}" class="btn btn-danger">Delete</a>
                 </div>
               </div>
             </div>

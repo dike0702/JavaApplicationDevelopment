@@ -18,5 +18,7 @@ urlpatterns = [
     path('tools/', views.ToolsView.as_view(), name='tools'),
     path('restaurant/<str:name>/favorite/', views.FavoriteView.as_view(), name='favorite'),
     path('add_menu/<str:pk>/', views.RestaurantMenuView.as_view(), name='add_menu'),
+    path('menu/edit/<int:pk>/', views.MenuItemEditView.as_view(), name='menu_edit'),
+    path('menu/delete/<int:pk>/', views.MenuItemDeleteView.as_view(), name='menu_delete'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

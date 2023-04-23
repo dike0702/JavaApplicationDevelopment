@@ -37,7 +37,7 @@ class ItemDetailView(View):
     def get(self, request, *args, **kwargs):
         restaurant_data = Restaurants.objects.get(name=self.kwargs['name'])
         review_data = Review.objects.order_by('-id')
-        menu_items = MenuItem.objects.order_by('-id')
+        menu_items = MenuItem.objects.filter(restaurant=restaurant_data)
         avg_rate = Review.objects.filter(restaurant=restaurant_data).aggregate(avg_rate=Avg('rate'))
         if avg_rate['avg_rate'] is not None:
             avg_rate_round = round(avg_rate['avg_rate'], 1)
@@ -164,8 +164,7 @@ class RestaurantDetailView(FormView):
         review.restaurant = restaurant
         review.author = self.request.user
         review.save()
-        context = self.get_context_data()
-        return self.render_to_response(context)
+        return super().form_valid(form)
 
     def get_success_url(self):
         restaurant = Restaurants.objects.get(name=self.kwargs['pk'])
@@ -236,24 +235,42 @@ class RestaurantMenuView(LoginRequiredMixin, UserPassesTestMixin, View):
         restaurant = Restaurants.objects.get(name=pk)
         form = MenuItemForm(request.POST, request.FILES)
         if form.is_valid():
-            menu_item = form.save(commit=False, restaurant=restaurant, author=self.request.user)
-            menu_item.restaurant = restaurant
+            menu_item = form.save(commit=False, restaurant=restaurant)
             menu_item.name = form.cleaned_data['name']
             menu_item.price = form.cleaned_data['price']
-            menu_item.save()
 
             # 画像がアップロードされている場合、保存する
             if form.cleaned_data['image']:
                 menu_item.image = form.cleaned_data['image']
-                menu_item.save()
+
+            menu_item.save()
 
             messages.success(request, 'Your menu item has been added.')
             return redirect('restaurant_detail', pk=restaurant.name)
 
         else:
             messages.error(request, 'There was an error adding your menu item.')
+
         context = {'restaurant': restaurant, 'form': form}
-        return render(request, 'application/add_menu', context)
+        return render(request, 'application/add_menu.html', context)
+
 
     def test_func(self):
         return self.request.user.is_authenticated
+    
+class MenuItemEditView(LoginRequiredMixin, UpdateView):
+    model = MenuItem
+    fields = ['name', 'price', 'image']
+    template_name = 'application/menu_edit.html'
+    success_url = reverse_lazy('top')
+
+class MenuItemDeleteView(LoginRequiredMixin, DeleteView):
+    model = MenuItem
+    template_name = 'application/menu_delete.html'
+    success_url = reverse_lazy('top')
+    
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        self.object.delete()
+        return HttpResponseRedirect(success_url)
