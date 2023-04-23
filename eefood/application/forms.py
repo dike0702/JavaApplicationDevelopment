@@ -39,10 +39,19 @@ class ReviewForm(forms.ModelForm):
         if commit:
             review.save()
         return review
-    
+
 class MenuItemForm(forms.ModelForm):
+    name = forms.CharField(max_length=255)
+    price = forms.DecimalField(max_digits=6, decimal_places=2)
+    image = forms.ImageField(required=False)
+
     class Meta:
         model = MenuItem
         fields = ['name', 'price', 'image']
-        labels = {'name': 'Menu Item Name', 'price': 'Price', 'image': 'Image'}
-        widgets = {'image': forms.FileInput(attrs={'class': 'form-control-file'})}
+
+    def save(self, restaurant=None, author=None, commit=True):
+        menu_item = super().save(commit=False)
+        menu_item.restaurant = restaurant
+        if commit:
+            menu_item.save()
+        return menu_item

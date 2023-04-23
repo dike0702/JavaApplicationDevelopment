@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import View, ListView
-from .models import Restaurants, Review, Reservation, FavoriteRestaurant
+from .models import Restaurants, Review, Reservation, FavoriteRestaurant, MenuItem
 from django.contrib import messages
 from .forms import ReviewForm, PostRestaurantForm, ReservationForm, MenuItemForm, RestaurantSearchForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -37,6 +37,7 @@ class ItemDetailView(View):
     def get(self, request, *args, **kwargs):
         restaurant_data = Restaurants.objects.get(name=self.kwargs['name'])
         review_data = Review.objects.order_by('-id')
+        menu_items = MenuItem.objects.order_by('-id')
         avg_rate = Review.objects.filter(restaurant=restaurant_data).aggregate(avg_rate=Avg('rate'))
         if avg_rate['avg_rate'] is not None:
             avg_rate_round = round(avg_rate['avg_rate'], 1)
@@ -48,7 +49,8 @@ class ItemDetailView(View):
             'restaurant_data': restaurant_data,
             'review_data': review_data,
             'avg_rate_round': avg_rate_round,
-            'avg_rate_stars': avg_rate_stars
+            'avg_rate_stars': avg_rate_stars,
+            'menu_items': menu_items
         })
 
 class PostRestaurantView(LoginRequiredMixin, View):
@@ -153,6 +155,7 @@ class RestaurantDetailView(FormView):
         restaurant = Restaurants.objects.get(name=self.kwargs['pk'])
         context['restaurant_data'] = restaurant
         context['review_data'] = Review.objects.filter(restaurant=restaurant)
+        context['menu_items'] = MenuItem.objects.filter(restaurant=restaurant)
         return context
 
     def form_valid(self, form):
@@ -223,24 +226,21 @@ class FavoriteView(LoginRequiredMixin, View):
 
 class RestaurantMenuView(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = '/accounts/login/'
-
-    def get_object(self):
-        return Restaurants.objects.get(name=self.kwargs['pk'])
-
     def get(self, request, pk):
-        restaurant = self.get_object()
+        restaurant = Restaurants.objects.get(name=pk)
         form = MenuItemForm()
         context = {'restaurant': restaurant, 'form': form}
         return render(request, 'application/add_menu.html', context)
 
     def post(self, request, pk):
-        restaurant = self.get_object()
+        restaurant = Restaurants.objects.get(name=pk)
         form = MenuItemForm(request.POST, request.FILES)
         if form.is_valid():
             menu_item = form.save(commit=False, restaurant=restaurant, author=self.request.user)
             menu_item.restaurant = restaurant
-            menu_item.name = request.user
+            menu_item.name = form.cleaned_data['name']
             menu_item.price = form.cleaned_data['price']
+            menu_item.save()
 
             # 画像がアップロードされている場合、保存する
             if form.cleaned_data['image']:
@@ -253,8 +253,7 @@ class RestaurantMenuView(LoginRequiredMixin, UserPassesTestMixin, View):
         else:
             messages.error(request, 'There was an error adding your menu item.')
         context = {'restaurant': restaurant, 'form': form}
-        return render(request, 'application/add_menu.html', context)
+        return render(request, 'application/add_menu', context)
 
     def test_func(self):
-        return self.request.user.is_authenticated and (self.request.user.is_superuser or self.get_object().created_by == self.request.user)
-
+        return self.request.user.is_authenticated
